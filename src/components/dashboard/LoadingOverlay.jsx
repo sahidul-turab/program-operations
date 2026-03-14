@@ -15,7 +15,7 @@ export function LoadingOverlay({ progress, status }) {
 
     useEffect(() => {
         if (progress === 100) {
-            const timer = setTimeout(() => setIsVisible(false), 1000); // Give time for fade
+            const timer = setTimeout(() => setIsVisible(false), 200); // Fast hide
             return () => clearTimeout(timer);
         }
     }, [progress]);
@@ -24,7 +24,7 @@ export function LoadingOverlay({ progress, status }) {
 
     return (
         <div className={cn(
-            "fixed inset-0 z-[100] bg-[#020617] flex flex-col items-center justify-center p-6 transition-all duration-1000 ease-in-out",
+            "fixed inset-0 z-[100] bg-[#020617] flex flex-col items-center justify-center p-6 transition-all duration-300 ease-in-out",
             progress === 100 ? "opacity-0 scale-105 pointer-events-none" : "opacity-100 scale-100"
         )}>
             {/* Background Glows */}

@@ -12,9 +12,11 @@ import {
 
 // Lazy load heavy components
 const DailyScheduleView = lazy(() => import('./components/dashboard/DailyScheduleView').then(module => ({ default: module.DailyScheduleView })));
-
-// Destructure from lazy modules
-import { CourseVolumeChart, DistributionBarChart, ChartCard } from './components/dashboard/Analytics';
+const CourseVolumeChart = lazy(() => import('./components/dashboard/Analytics').then(m => ({ default: m.CourseVolumeChart })));
+const DistributionBarChart = lazy(() => import('./components/dashboard/Analytics').then(m => ({ default: m.DistributionBarChart })));
+const ChartCard = lazy(() => import('./components/dashboard/Analytics').then(m => ({ default: m.ChartCard })));
+const SubjectMappingModal = lazy(() => import('./components/dashboard/SubjectMappingModal').then(module => ({ default: module.SubjectMappingModal })));
+const DrillDownModal = lazy(() => import('./components/dashboard/DrillDownModal').then(module => ({ default: module.DrillDownModal })));
 
 import { fetchScheduleData, getCachedScheduleData } from './lib/api';
 import {
@@ -28,8 +30,7 @@ import {
 } from './lib/aggregations';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay, differenceInDays, addDays } from 'date-fns';
 import { getSubjectCluster } from './lib/subjects';
-import { SubjectMappingModal } from './components/dashboard/SubjectMappingModal';
-import { DrillDownModal } from './components/dashboard/DrillDownModal';
+// Modal imports removed as they are now lazy loaded
 import { Settings } from 'lucide-react';
 
 import { AlertCircle, Layout } from 'lucide-react';
@@ -74,7 +75,24 @@ function App() {
 
   const [error, setError] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(null);
-  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const [filters, setFilters] = useState(() => {
+    try {
+      const saved = localStorage.getItem('shikho_dashboard_filters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Ensure we have valid dates if we load from storage
+        if (parsed.startDate && parsed.endDate) return parsed;
+      }
+    } catch (e) {}
+    
+    const today = format(new Date(), 'yyyy-MM-dd');
+    return { ...INITIAL_FILTERS, startDate: today, endDate: today };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('shikho_dashboard_filters', JSON.stringify(filters));
+  }, [filters]);
+
   const [chartMode, setChartMode] = useState('Class');
   const [distMode, setDistMode] = useState('Class');
   const [chartAxis, setChartAxis] = useState('Date');
@@ -114,29 +132,16 @@ function App() {
       setData(scheduleData || []);
       setLastRefreshed(new Date());
 
-      // Set initial date range if not set
-      if (!filters.startDate) {
-        const today = new Date();
-        setFilters(prev => ({
-          ...prev,
-          startDate: format(today, 'yyyy-MM-dd'),
-          endDate: format(today, 'yyyy-MM-dd')
-        }));
-      }
-
+      // NO DELAYS: Dashboard is ready immediately
+      setLoadingProgress(100);
+      setLoadingStatus('Dashboard Ready');
+      
       if (instant) {
-        setLoadingProgress(100);
-        setLoadingStatus('Using optimized cached view...');
-        setTimeout(() => setLoading(false), 300);
+        // Use requestAnimationFrame for the fastest possible UI swap
+        requestAnimationFrame(() => setLoading(false));
       } else {
-        const elapsed = Date.now() - startTime;
-        const minLoad = 1500;
-        const remaining = Math.max(0, minLoad - elapsed);
-        setTimeout(() => {
-          setLoadingProgress(100);
-          setLoadingStatus('Dashboard Ready');
-          setTimeout(() => setLoading(false), 600);
-        }, remaining);
+        // Minimal wait for fresh network loads to avoid flicker
+        setTimeout(() => setLoading(false), 100);
       }
     };
 
@@ -155,20 +160,13 @@ function App() {
       // 2. Setup progress bar if not loaded instantly
       let progressTimer;
       if (!dataLoadedFromCache || forceRefresh) {
+        setLoadingStatus('Fetching live updates...');
         progressTimer = setInterval(() => {
           setLoadingProgress(prev => {
-            if (prev < 30) return prev + 1.5;
-            if (prev < 65) {
-              setLoadingStatus('Fetching schedule data...');
-              return prev + 0.8;
-            }
-            if (prev < 88) {
-              setLoadingStatus('Processing records...');
-              return prev + 0.4;
-            }
+            if (prev < 90) return prev + 5; // Fast progress
             return prev;
           });
-        }, 100);
+        }, 50);
       }
 
       // 3. Fetch data (will hit exact cache in api.js if < 15min, or hit network)
