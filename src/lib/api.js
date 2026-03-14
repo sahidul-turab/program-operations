@@ -1,6 +1,5 @@
 import { format, parseISO, isValid } from 'date-fns';
-
-const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyooi5zLMe9s4eXtWgxNPwMM36I99-36q6GROzI-FKi23ULkQaXEAlP4i9QnkKY8WxlFA/exec';
+import localforage from 'localforage';const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyooi5zLMe9s4eXtWgxNPwMM36I99-36q6GROzI-FKi23ULkQaXEAlP4i9QnkKY8WxlFA/exec';
 const CACHE_KEY = 'shikho_schedule_cache';
 const CACHE_TTL = 15 * 60 * 1000; // 15 minutes in milliseconds
 
@@ -144,16 +143,31 @@ const calculateDuration = (start, end) => {
     }
 };
 
+export const getCachedScheduleData = async () => {
+    try {
+        const cached = await localforage.getItem(CACHE_KEY);
+        if (cached && (Date.now() - cached.timestamp < 24 * 60 * 60 * 1000)) {
+            return cached.data;
+        }
+    } catch (e) {
+        console.warn('Error reading cache:', e);
+    }
+    return null;
+};
+
 export const fetchScheduleData = async (forceRefresh = false) => {
     // Check Cache first
     if (!forceRefresh) {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-            const { data, timestamp } = JSON.parse(cached);
-            if (Date.now() - timestamp < CACHE_TTL) {
-                console.log('Serving from cache (Faster Load)');
-                return data;
+        try {
+            const cached = await localforage.getItem(CACHE_KEY);
+            if (cached) {
+                if (Date.now() - cached.timestamp < CACHE_TTL) {
+                    console.log('Serving from cache (Faster Load)');
+                    return cached.data;
+                }
             }
+        } catch (e) {
+            console.warn('Error reading cache during fetch:', e);
         }
     }
 
@@ -214,17 +228,23 @@ export const fetchScheduleData = async (forceRefresh = false) => {
             });
 
         // Store in Cache
-        localStorage.setItem(CACHE_KEY, JSON.stringify({
-            data: transformedData,
-            timestamp: Date.now()
-        }));
+        try {
+            await localforage.setItem(CACHE_KEY, {
+                data: transformedData,
+                timestamp: Date.now()
+            });
+        } catch (storageError) {
+            console.warn('Error saving to cache:', storageError);
+        }
 
         return transformedData;
     } catch (error) {
         console.error('Fetch error:', error);
         // Fallback to cache if network fails
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) return JSON.parse(cached).data;
+        try {
+            const cached = await localforage.getItem(CACHE_KEY);
+            if (cached && cached.data) return cached.data;
+        } catch (e) {}
         throw error;
     }
 };

@@ -16,7 +16,7 @@ const DailyScheduleView = lazy(() => import('./components/dashboard/DailySchedul
 // Destructure from lazy modules
 import { CourseVolumeChart, DistributionBarChart, ChartCard } from './components/dashboard/Analytics';
 
-import { fetchScheduleData } from './lib/api';
+import { fetchScheduleData, getCachedScheduleData } from './lib/api';
 import {
   getEventCategoryStats,
   getEventsByDayOfWeek,
@@ -110,29 +110,7 @@ function App() {
 
     const startTime = Date.now();
 
-    try {
-      // Staged progress simulation
-      const progressTimer = setInterval(() => {
-        setLoadingProgress(prev => {
-          if (prev < 30) return prev + 1.5;
-          if (prev < 65) {
-            setLoadingStatus('Fetching schedule data...');
-            return prev + 0.8;
-          }
-          if (prev < 88) {
-            setLoadingStatus('Processing records...');
-            return prev + 0.4;
-          }
-          return prev;
-        });
-      }, 100);
-
-      const scheduleData = await fetchScheduleData(forceRefresh);
-      clearInterval(progressTimer);
-
-      setLoadingProgress(92);
-      setLoadingStatus('Preparing charts...');
-
+    const applyData = (scheduleData, instant = false) => {
       setData(scheduleData || []);
       setLastRefreshed(new Date());
 
@@ -146,26 +124,73 @@ function App() {
         }));
       }
 
-      // Ensure minimum loading time for UX feel if API is too fast
-      const elapsed = Date.now() - startTime;
-      const minLoad = 1500;
-      const remaining = Math.max(0, minLoad - elapsed);
-
-      setTimeout(() => {
+      if (instant) {
         setLoadingProgress(100);
-        setLoadingStatus('Dashboard Ready');
-        // Give a moment for the 100% state to be seen before transition
+        setLoadingStatus('Using optimized cached view...');
+        setTimeout(() => setLoading(false), 300);
+      } else {
+        const elapsed = Date.now() - startTime;
+        const minLoad = 1500;
+        const remaining = Math.max(0, minLoad - elapsed);
         setTimeout(() => {
-          setLoading(false);
-        }, 600);
-      }, remaining);
+          setLoadingProgress(100);
+          setLoadingStatus('Dashboard Ready');
+          setTimeout(() => setLoading(false), 600);
+        }, remaining);
+      }
+    };
 
+    try {
+      let dataLoadedFromCache = false;
+
+      // 1. Try instant load from cache first
+      if (!forceRefresh) {
+        const cachedData = await getCachedScheduleData();
+        if (cachedData && cachedData.length > 0) {
+          applyData(cachedData, true);
+          dataLoadedFromCache = true;
+        }
+      }
+
+      // 2. Setup progress bar if not loaded instantly
+      let progressTimer;
+      if (!dataLoadedFromCache || forceRefresh) {
+        progressTimer = setInterval(() => {
+          setLoadingProgress(prev => {
+            if (prev < 30) return prev + 1.5;
+            if (prev < 65) {
+              setLoadingStatus('Fetching schedule data...');
+              return prev + 0.8;
+            }
+            if (prev < 88) {
+              setLoadingStatus('Processing records...');
+              return prev + 0.4;
+            }
+            return prev;
+          });
+        }, 100);
+      }
+
+      // 3. Fetch data (will hit exact cache in api.js if < 15min, or hit network)
+      const scheduleData = await fetchScheduleData(forceRefresh);
+      if (progressTimer) clearInterval(progressTimer);
+
+      // 4. Update the UI
+      if (!dataLoadedFromCache || forceRefresh) {
+        setLoadingProgress(92);
+        setLoadingStatus('Preparing charts...');
+        applyData(scheduleData, false);
+      } else {
+        // Silently update if we already showed cache without loaders
+        setData(scheduleData || []);
+        setLastRefreshed(new Date());
+      }
     } catch (err) {
-      setError(err.message || 'Failed to fetch schedule data');
+      if (!data.length) setError(err.message || 'Failed to fetch schedule data');
       setLoading(false);
       setLoadingProgress(100);
     }
-  }, [filters.startDate]);
+  }, [filters.startDate, data.length]);
 
   useEffect(() => {
     loadData();
