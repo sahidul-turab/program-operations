@@ -88,22 +88,22 @@ export function KpiCards({ kpis, onCardClick }) {
     ];
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
             {cards.map((card) => {
                 const Icon = card.icon;
                 return (
                     <Card
                         key={card.key}
                         onClick={() => onCardClick?.(card.key)}
-                        className="relative group p-5 premium-card border-none bg-slate-900/40 hover:bg-slate-900/60 transition-all cursor-pointer overflow-hidden active:scale-[0.98]"
+                        className="relative group p-4 sm:p-5 premium-card border-none bg-slate-900/40 hover:bg-slate-900/60 transition-all cursor-pointer overflow-hidden active:scale-[0.98]"
                     >
-                        <div className="flex items-center gap-4 relative z-10">
-                            <div className={cn("p-3 rounded-xl transition-all duration-500 group-hover:scale-110 flex-shrink-0", card.bg)}>
-                                <Icon className={cn("w-5 h-5", card.color)} />
+                        <div className="flex items-center gap-3 sm:gap-4 relative z-10">
+                            <div className={cn("p-2 sm:p-3 rounded-xl transition-all duration-500 group-hover:scale-110 flex-shrink-0", card.bg)}>
+                                <Icon className={cn("w-4 h-4 sm:w-5 sm:h-5", card.color)} />
                             </div>
                             <div className="min-w-0">
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-tight mb-1 line-clamp-2">{card.label}</p>
-                                <p className="text-2xl font-black text-slate-100 tracking-tight truncate leading-none">
+                                <p className="text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest leading-tight mb-0.5 sm:mb-1 line-clamp-2">{card.label}</p>
+                                <p className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight truncate leading-none">
                                     {card.value}
                                 </p>
                             </div>

@@ -547,7 +547,7 @@ function App() {
         dateContext={dateContext}
       />
 
-      <main className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-transition">
+      <main className="max-w-screen-2xl mx-auto px-2 sm:px-6 lg:px-8 py-4 sm:py-8 page-transition">
         <Header lastRefreshed={lastRefreshed} onRefresh={() => loadData(true)} isLoading={loading} />
 
         {(!lastRefreshed) ? <KpiSkeleton /> : <KpiCards kpis={kpis} onCardClick={handleKpiClick} />}
@@ -558,8 +558,8 @@ function App() {
               title={`${chartAxis}-wise ${chartMode} Volume`}
               subtitle={`Distribution of ${chartMode.toLowerCase()}s by ${chartAxis.toLowerCase()}`}
               extra={
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 scale-90 sm:scale-100 origin-right">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
+                  <div className="flex items-center gap-1 sm:gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 w-full sm:w-auto overflow-x-auto overflow-y-hidden custom-scrollbar">
                     {['Date', 'Batch', 'Teacher'].map(a => {
                       const isSingleDay = filters.startDate && filters.endDate && filters.startDate === filters.endDate;
                       const isDisabled = (a === 'Teacher' && chartMode === 'Exam') || (a === 'Date' && isSingleDay);
@@ -568,7 +568,7 @@ function App() {
                       );
                     })}
                   </div>
-                  <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 scale-90 sm:scale-100 origin-right">
+                  <div className="flex items-center gap-1 sm:gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 w-full sm:w-auto">
                     {['Class', 'Exam'].map(m => {
                       const isDisabled = m === 'Exam' && chartAxis === 'Teacher';
                       return (
@@ -589,8 +589,8 @@ function App() {
               title={`${hoursAxis}-wise ${hoursMode} Hours`}
               subtitle={`Total duration of ${hoursMode.toLowerCase()}s by ${hoursAxis.toLowerCase()}`}
               extra={
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 scale-90 sm:scale-100 origin-right">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
+                  <div className="flex items-center gap-1 sm:gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 w-full sm:w-auto overflow-x-auto overflow-y-hidden custom-scrollbar">
                     {['Date', 'Batch', 'Teacher'].map(a => {
                       const isSingleDay = filters.startDate && filters.endDate && filters.startDate === filters.endDate;
                       const isDisabled = (a === 'Teacher' && hoursMode === 'Exam') || (a === 'Date' && isSingleDay);
@@ -599,7 +599,7 @@ function App() {
                       );
                     })}
                   </div>
-                  <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 scale-90 sm:scale-100 origin-right">
+                  <div className="flex items-center gap-1 sm:gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 w-full sm:w-auto">
                     {['Class', 'Exam'].map(m => {
                       const isDisabled = m === 'Exam' && hoursAxis === 'Teacher';
                       return (

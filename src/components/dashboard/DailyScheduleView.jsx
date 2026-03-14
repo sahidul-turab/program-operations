@@ -134,8 +134,8 @@ export function DailyScheduleView({ data, startDate, endDate, isLoading, activeT
     }
 
     return (
-        <section id="daily-schedule" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-6 relative">
+        <section id="daily-schedule" className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-4 sm:pb-6 relative flex-wrap">
                 <div className="space-y-1">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-shikho-500/10 rounded-xl border border-shikho-500/20">
@@ -148,7 +148,7 @@ export function DailyScheduleView({ data, startDate, endDate, isLoading, activeT
                             {sortedData.length} {activeTab === 'Class' ? 'Sessions' : 'Exams'}
                         </Badge>
                     </div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-12">
+                    <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-12 line-clamp-1">
                         Operational focus for <span className="text-shikho-400">{displayDate}</span>
                     </p>
                 </div>
@@ -270,8 +270,8 @@ export function DailyScheduleView({ data, startDate, endDate, isLoading, activeT
                 </div>
 
                 {sortedData.length > pageSize && (
-                    <div className="px-6 py-4 border-t border-slate-800 bg-[#0f172a]/80 flex items-center justify-between">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <div className="px-4 sm:px-6 py-4 border-t border-slate-800 bg-[#0f172a]/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center sm:text-left">
                             Showing <span className="text-slate-300">{(currentPage - 1) * pageSize + 1}</span> to <span className="text-slate-300">{Math.min(currentPage * pageSize, sortedData.length)}</span> of <span className="text-shikho-400">{sortedData.length}</span> {activeTab}s
                         </div>
                         <div className="flex items-center gap-2">

@@ -70,10 +70,10 @@ export function FilterBar({ filters, setFilters, uniqueData, onReset }) {
 
     return (
         <div className="relative w-full bg-[#020617]/80 backdrop-blur-xl border-b border-slate-800/60 transition-all duration-300">
-            <div className="max-w-screen-2xl mx-auto px-4 py-2">
-                <div className="flex flex-wrap items-center gap-3">
+            <div className="max-w-screen-2xl mx-auto px-4 py-2 sm:py-3">
+                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
                     {/* Date Section */}
-                    <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1">
+                    <div className="flex items-center justify-between sm:justify-start gap-2 bg-slate-900/50 border border-slate-800 rounded-lg p-1 overflow-x-auto overflow-y-hidden custom-scrollbar w-full sm:w-auto">
                         <select
                             className="bg-transparent text-xs font-bold text-slate-300 px-2 py-1 outline-none cursor-pointer hover:text-white transition-colors"
                             value={filters.quickRange || ''}
@@ -113,7 +113,7 @@ export function FilterBar({ filters, setFilters, uniqueData, onReset }) {
                     </div>
 
                     {/* Multi-Select Filters */}
-                    <div className="flex flex-wrap items-center gap-2 flex-grow">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto flex-grow">
                         <MultiSelect
                             label="Batches"
                             options={uniqueData.batches}
@@ -132,7 +132,7 @@ export function FilterBar({ filters, setFilters, uniqueData, onReset }) {
                             selected={filters.teachers || []}
                             onChange={(vals) => handleFilterChange('teachers', vals)}
                         />
-                        <div className="relative min-w-[200px] flex-grow max-w-xs">
+                        <div className="relative w-full col-span-2 sm:col-span-1 sm:min-w-[200px] sm:flex-grow sm:max-w-xs mt-2 sm:mt-0">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
                             <input
                                 type="text"
@@ -149,7 +149,7 @@ export function FilterBar({ filters, setFilters, uniqueData, onReset }) {
                         variant="ghost"
                         size="sm"
                         onClick={onReset}
-                        className="h-9 px-3 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest ml-auto"
+                        className="h-9 px-3 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg flex items-center justify-center gap-2 font-bold text-[10px] uppercase tracking-widest w-full sm:w-auto sm:ml-auto border border-slate-800 sm:border-transparent mt-2 sm:mt-0"
                     >
                         <RotateCcw className="w-3 h-3" />
                         Reset

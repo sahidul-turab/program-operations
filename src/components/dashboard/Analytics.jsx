@@ -26,17 +26,17 @@ const COLORS = ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'
 export function ChartCard({ title, subtitle, children, className, extra }) {
     return (
         <Card className={cn("p-0 flex flex-col h-full premium-card border-slate-800/40 bg-[#020617]/50 shadow-2xl overflow-visible group", className)}>
-            <div className="p-5 pb-2 flex items-center justify-between">
+            <div className="p-4 sm:p-5 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
                 <div>
-                    <h3 className="text-xs font-black text-slate-100 uppercase tracking-widest group-hover:text-shikho-400 transition-colors flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-shikho-500" />
+                    <h3 className="text-[10px] sm:text-xs font-black text-slate-100 uppercase tracking-widest group-hover:text-shikho-400 transition-colors flex items-center gap-2">
+                        <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-shikho-500" />
                         {title}
                     </h3>
-                    {subtitle && <p className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-tight">{subtitle}</p>}
+                    {subtitle && <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 mt-0.5 sm:mt-1 uppercase tracking-tight line-clamp-1">{subtitle}</p>}
                 </div>
-                {extra && <div className="flex items-center gap-2">{extra}</div>}
+                {extra && <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto overflow-y-hidden custom-scrollbar pb-1 sm:pb-0">{extra}</div>}
             </div>
-            <div className="flex-1 min-h-[350px] w-full p-4 pt-2 flex flex-col">
+            <div className="flex-1 min-h-[300px] sm:min-h-[350px] w-full p-2 sm:p-4 pt-2 flex flex-col">
                 {children}
             </div>
         </Card>
