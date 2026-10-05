@@ -1,16 +1,53 @@
-# React + Vite
+# Shikho Program Ops Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**A live BI dashboard for Shikho's class and exam schedule.** It reads the operations
+schedule directly from Google Sheets and turns it into KPIs, charts, a daily schedule
+view and automatic clash detection.
 
-Currently, two official plugins are available:
+**Live:** https://program-operations.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## What it shows
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| View | What you get |
+|---|---|
+| **KPI cards** | Total sessions, live vs pre-recorded classes, exams, and more for the selected range |
+| **Analytics** | Day distribution, time-of-day distribution, subject and batch breakdowns (Recharts) |
+| **Daily schedule** | Every session with date, time, duration, batch, subject, topic, teacher, class type, exam type and platform |
+| **Operations view: conflicts** | Flags overlapping sessions (e.g. the same teacher booked twice) and shows each clashing pair side by side, plus the most clash-prone teacher |
+| **Drill-down** | Click any chart segment to see the sessions behind it |
+| **Subject mapping** | Merge or rename messy subject names from the sheet, with per-subject overrides |
 
-## Expanding the ESLint configuration
+Filters for batch, subject and teacher apply to every view.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## How it works
+
+```
+Google Sheet (ops schedule)
+   │  Google Apps Script web app → JSON
+   ▼
+src/lib/api.js  ──  normalises times (incl. the 1899 Sheets date quirk for Dhaka),
+                    classifies class vs exam types, caches for 15 min (localforage)
+   ▼
+React dashboard (aggregations.js, conflicts.js)
+```
+
+## Tech stack
+
+- **React 19** + **Vite**
+- **Tailwind CSS**
+- **Recharts** for charts, **date-fns** for dates
+- **localforage** for client-side caching
+- Deployed on **Vercel**
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+---
+
+Built by [Sahidul Turab](https://github.com/sahidul-turab).
